@@ -185,7 +185,7 @@ def create_progressive_model_configs(constraints: Dict[str, Any]) -> List[Tuple[
     return viable_configs
 
 def create_scaled_training_config(model_size: str, device: str) -> Any:
-    """Create training configuration appropriate for model size - FIXED for memorization."""
+    """Create training configuration for MEMORIZING random sequences - ULTRA AGGRESSIVE."""
     
     class ScaledTrainingConfig:
         def __init__(self, batch_size, learning_rate, max_steps, warmup_steps, weight_decay=0.01):
@@ -195,31 +195,35 @@ def create_scaled_training_config(model_size: str, device: str) -> Any:
             self.warmup_steps = warmup_steps
             self.weight_decay = weight_decay
     
-    # MUCH more aggressive training for memorization of random sequences
+    # ULTRA AGGRESSIVE for random sequence memorization
     config_map = {
-        "Tiny": {"batch_size": 16, "max_steps": 5000, "lr": 5e-3},    # 10x more steps, 5x higher LR
-        "Mini": {"batch_size": 12, "max_steps": 8000, "lr": 3e-3},    # 10x more steps, 4x higher LR  
-        "Small": {"batch_size": 16, "max_steps": 10000, "lr": 2e-3},  # 20x more steps, 2x higher LR
-        "Medium": {"batch_size": 12, "max_steps": 15000, "lr": 1e-3}, # 19x more steps
-        "Large": {"batch_size": 8, "max_steps": 20000, "lr": 8e-4},   # 17x more steps
-        "XL": {"batch_size": 4, "max_steps": 25000, "lr": 5e-4},      # 17x more steps
-        "XXL": {"batch_size": 2, "max_steps": 30000, "lr": 3e-4},     # 15x more steps
+        "Tiny": {"batch_size": 32, "max_steps": 10000, "lr": 1e-2},   # 10x higher LR
+        "Mini": {"batch_size": 32, "max_steps": 12000, "lr": 8e-3},   # 8x higher LR  
+        "Small": {"batch_size": 32, "max_steps": 15000, "lr": 5e-3},  # 5x higher LR
+        "Medium": {"batch_size": 32, "max_steps": 20000, "lr": 3e-3}, # 3x higher LR
+        "Large": {"batch_size": 32, "max_steps": 25000, "lr": 2e-3},  # 2x higher LR
+        "XL": {"batch_size": 32, "max_steps": 30000, "lr": 1e-3},     # Higher LR
+        "XXL": {"batch_size": 32, "max_steps": 35000, "lr": 8e-4},    # Higher LR
     }
     
     params = config_map.get(model_size, config_map["Small"])
     
-    # Adjust for device - but still need substantial training for memorization
+    # Reduce weight decay for memorization (prevents overfitting)
+    weight_decay = 0.001  # Much lower weight decay
+    
+    # Adjust for device - but keep aggressive settings
     if device == "cpu":
-        params["batch_size"] = max(1, params["batch_size"] // 2)  # Smaller batches for CPU
-        params["max_steps"] = max(2000, params["max_steps"] // 2)  # Still need minimum 2K steps
+        params["batch_size"] = max(16, params["batch_size"] // 2)  # Still reasonable batch size
+        params["max_steps"] = max(5000, params["max_steps"] // 2)  # Still substantial training
     
     return ScaledTrainingConfig(
         batch_size=params["batch_size"],
         learning_rate=params["lr"],
         max_steps=params["max_steps"],
-        warmup_steps=params["max_steps"] // 20,  # 5% warmup
-        weight_decay=0.01
+        warmup_steps=params["max_steps"] // 50,  # Minimal warmup - get to high LR fast
+        weight_decay=weight_decay
     )
+
 
 def get_scaled_dataset_sizes(model_size: str) -> List[int]:
     """Get appropriate dataset sizes for different model scales - Morris et al. scale."""
