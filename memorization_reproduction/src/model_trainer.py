@@ -240,6 +240,7 @@ def get_linear_warmup_scheduler(
             return 0.5 * (1.0 + math.cos(math.pi * progress))
     
     return optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+
 def train_model(
     model: torch.nn.Module,
     train_data: List[torch.Tensor],
@@ -247,12 +248,7 @@ def train_model(
     device: str = "cuda"
 ) -> Dict[str, List[float]]:
     """
-    Train model until convergence with proper termination criteria and learning rate scaling.
-    
-    Termination conditions:
-    1. Loss < memorization_threshold (memorization achieved)
-    2. No improvement for patience steps (plateau) - only if loss is reasonable
-    3. max_steps reached (safety fallback)
+    Train model until convergence with proper termination criteria.
     """
     model = model.to(device)
     model.train()
@@ -264,33 +260,31 @@ def train_model(
     dataset_size = len(train_data)
     
     # DATASET-AWARE LEARNING RATE SCALING
-    # Larger datasets can handle higher learning rates due to gradient stability
     if dataset_size >= 1000:
-        dataset_scale = min(5.0, (dataset_size / 1000.0) ** 0.5)  # sqrt scaling up for large datasets
+        dataset_scale = min(5.0, (dataset_size / 1000.0) ** 0.5)  # sqrt scaling for large datasets
     else:
-        dataset_scale = 1.0  # Normal LR for small datasets (don't scale down)
+        dataset_scale = 1.0  # Normal LR for small datasets
     scaled_lr = config.learning_rate * dataset_scale
     
-    # CONVERGENCE CRITERIA for memorization
-    memorization_threshold = 0.15  # Near-perfect memorization
-    patience = 2000  # Steps to wait for improvement
-    min_steps = 1000  # Minimum training before early stopping
-    max_steps = config.max_steps  # Safety fallback
-    high_loss_threshold = 3.0  # Don't stop on "no improvement" if loss > this
+    # CONVERGENCE CRITERIA
+    memorization_threshold = 0.15
+    patience = 2000
+    min_steps = 1000
+    max_steps = config.max_steps
+    high_loss_threshold = 3.0
     
     print(f"    Training: {dataset_size} sequences until convergence")
     print(f"    LR scaled: {config.learning_rate:.2e} → {scaled_lr:.2e} (scale: {dataset_scale:.2f}x)")
     print(f"    Targets: loss < {memorization_threshold}, patience={patience}")
     
-    # Create optimizer with scaled learning rate
+    # Create optimizer and scheduler
     optimizer = optim.Adam(
         model.parameters(),
-        lr=scaled_lr,  # Use scaled learning rate
+        lr=scaled_lr,
         weight_decay=config.weight_decay,
         betas=(0.9, 0.95)
     )
     
-    # Create scheduler
     scheduler = get_linear_warmup_scheduler(
         optimizer, config.warmup_steps, max_steps
     )
@@ -304,13 +298,13 @@ def train_model(
     initial_loss = None
     best_loss = float('inf')
     steps_without_improvement = 0
-    last_convergence_check = 0  # Track when we last checked convergence
     
-    # Training loop with convergence checking
+    # MAIN TRAINING LOOP
     while step < max_steps:
         epoch_loss = 0.0
         epoch_steps = 0
         
+        # BATCH TRAINING LOOP
         for batch in dataloader:
             if step >= max_steps:
                 break
@@ -319,8 +313,6 @@ def train_model(
             
             # Forward pass
             logits = model(batch)
-            
-            # Calculate loss
             shift_logits = logits[..., :-1, :].contiguous()
             shift_labels = batch[..., 1:].contiguous()
             
@@ -340,56 +332,55 @@ def train_model(
             optimizer.step()
             scheduler.step()
             
-            # Track loss
+            # Track loss for epoch
             current_loss = loss.item()
             epoch_loss += current_loss
             epoch_steps += 1
             
-            # Log periodically
+            # Log metrics periodically
             if step % 100 == 0:
                 metrics["train_loss"].append(current_loss)
                 metrics["learning_rate"].append(scheduler.get_last_lr()[0])
                 metrics["step"].append(step)
             
             step += 1
+        
+        # CONVERGENCE CHECK (after each epoch)
+        if step >= min_steps and epoch_steps > 0:
+            avg_epoch_loss = epoch_loss / epoch_steps
             
-            # CHECK CONVERGENCE every 100 steps (after minimum training)
-            if step % 100 == 0 and step >= min_steps and step > last_convergence_check:
-                last_convergence_check = step
-                avg_recent_loss = epoch_loss / epoch_steps if epoch_steps > 0 else current_loss
-                
-                # CONDITION 1: Memorization achieved
-                if avg_recent_loss < memorization_threshold:
-                    print(f"    CONVERGED: Memorization achieved (loss {avg_recent_loss:.3f} < {memorization_threshold})")
+            # CONDITION 1: Memorization achieved
+            if avg_epoch_loss < memorization_threshold:
+                print(f"    CONVERGED: Memorization achieved (loss {avg_epoch_loss:.3f} < {memorization_threshold})")
+                # Record final metrics
+                metrics["train_loss"].append(avg_epoch_loss)
+                metrics["learning_rate"].append(scheduler.get_last_lr()[0])
+                metrics["step"].append(step)
+                break  # Exit main training loop
+            
+            # CONDITION 2: Check for improvement
+            if avg_epoch_loss < best_loss - 0.01:  # Significant improvement
+                best_loss = avg_epoch_loss
+                steps_without_improvement = 0
+            else:
+                steps_without_improvement += epoch_steps
+            
+            # CONDITION 3: Early stopping (plateau)
+            if steps_without_improvement >= patience:
+                if avg_epoch_loss < high_loss_threshold:
+                    print(f"    CONVERGED: No improvement for {patience} steps (loss plateau at {avg_epoch_loss:.3f})")
                     break
-                
-                # CONDITION 2: Check for improvement (but not if loss is very high)
-                if avg_recent_loss < best_loss - 0.01:  # Significant improvement
-                    best_loss = avg_recent_loss
-                    steps_without_improvement = 0
                 else:
-                    steps_without_improvement += 100
-                
-                # Early stopping - but NOT if loss is still very high (model learning basics)
-                if steps_without_improvement >= patience and avg_recent_loss < high_loss_threshold:
-                    print(f"    CONVERGED: No improvement for {patience} steps (loss plateau at {avg_recent_loss:.3f})")
-                    break
-                elif steps_without_improvement >= patience and avg_recent_loss >= high_loss_threshold:
-                    # Reset patience if loss is still very high - model hasn't learned basics yet
-                    print(f"    Resetting patience: loss still high ({avg_recent_loss:.3f}), continuing training")
+                    # Reset patience if loss still very high
+                    print(f"    Resetting patience: loss still high ({avg_epoch_loss:.3f}), continuing training")
                     steps_without_improvement = 0
-                    best_loss = avg_recent_loss  # Reset best loss tracking
-                
-                # Reset for next epoch tracking
-                epoch_loss = 0.0
-                epoch_steps = 0
+                    best_loss = avg_epoch_loss
     
-    # Final metrics
+    # Final metrics and termination reason
     final_loss = metrics["train_loss"][-1] if metrics["train_loss"] else float('nan')
     
-    # Determine termination reason
     if step >= max_steps:
-        termination_reason = f"MAX_STEPS"
+        termination_reason = "MAX_STEPS"
     elif final_loss < memorization_threshold:
         termination_reason = "MEMORIZATION_ACHIEVED"
     else:
