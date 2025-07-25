@@ -266,7 +266,7 @@ def train_model(
     
     # DATASET-AWARE LEARNING RATE SCALING
     # Larger datasets can handle higher learning rates due to gradient stability
-    dataset_scale = min(3.0, (dataset_size / 1000.0) ** 0.5)  # sqrt scaling up to 3x
+    dataset_scale = min(5.0, dataset_size / 1000.0)  # Linear scaling up to 5x
     scaled_lr = config.learning_rate * dataset_scale
     
     # CONVERGENCE CRITERIA for memorization
