@@ -197,13 +197,13 @@ def create_scaled_training_config(model_size: str, device: str) -> Any:
     
     # EXTREME settings for random sequence memorization  
     config_map = {
-        "Tiny": {"batch_size": 64, "max_steps": 25000, "lr": 2e-2},   # 20x higher LR, 2.5x more steps
-        "Mini": {"batch_size": 64, "max_steps": 30000, "lr": 1.5e-2}, # 15x higher LR  
-        "Small": {"batch_size": 64, "max_steps": 35000, "lr": 1e-2},  # 10x higher LR
-        "Medium": {"batch_size": 64, "max_steps": 40000, "lr": 8e-3}, # 8x higher LR
-        "Large": {"batch_size": 64, "max_steps": 45000, "lr": 5e-3},  # 5x higher LR
-        "XL": {"batch_size": 64, "max_steps": 50000, "lr": 3e-3},     # 3x higher LR
-        "XXL": {"batch_size": 64, "max_steps": 55000, "lr": 2e-3"},   # 2x higher LR
+        "Tiny": {"batch_size": 64, "max_steps": 25000, "lr": 2e-2},
+        "Mini": {"batch_size": 64, "max_steps": 30000, "lr": 1.5e-2}, 
+        "Small": {"batch_size": 64, "max_steps": 35000, "lr": 1e-2},
+        "Medium": {"batch_size": 64, "max_steps": 40000, "lr": 8e-3},
+        "Large": {"batch_size": 64, "max_steps": 45000, "lr": 5e-3},
+        "XL": {"batch_size": 64, "max_steps": 50000, "lr": 3e-3},
+        "XXL": {"batch_size": 64, "max_steps": 55000, "lr": 2e-3},
     }
     
     params = config_map.get(model_size, config_map["Small"])
