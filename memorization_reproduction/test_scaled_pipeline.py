@@ -232,20 +232,30 @@ def create_scaled_training_config(model_size: str, device: str) -> Any:
         weight_decay=weight_decay
     )
 
-def get_scaled_dataset_sizes(model_size: str) -> List[int]:
-    """Get appropriate dataset sizes for different model scales - Morris et al. scale."""
-    # Morris et al. uses datasets from 1K to 8M+ samples (Figure 1)
-    size_map = {
-        "Tiny": [1000, 5000, 25000, 100000, 500000],
-        "Mini": [2000, 10000, 50000, 200000, 1000000], 
-        "Small": [5000, 25000, 100000, 500000, 2000000],
-        "Medium": [10000, 50000, 250000, 1000000, 4000000],
-        "Large": [25000, 100000, 500000, 2000000, 8000000],
-        "XL": [50000, 250000, 1000000, 4000000, 16000000],
-        "XXL": [100000, 500000, 2000000, 8000000, 32000000],
-    }
-    
-    return size_map.get(model_size, size_map["Small"])
+    def get_scaled_dataset_sizes(model_size: str) -> List[int]:
+        """Dataset sizes appropriate for model capacity."""
+        size_map = {
+            "Debug-Micro": [50, 100, 200, 400, 800],      # Tiny capacity
+            "Debug-Mini": [200, 500, 1000, 2000, 4000],   # Small capacity  
+            "Debug-Small": [500, 1000, 2000, 4000, 8000], # Medium capacity
+            "Debug-Medium": [1000, 2500, 5000, 10000, 20000], # Larger capacity
+        }
+        return size_map.get(model_size, size_map["Debug-Small"])
+
+#def get_scaled_dataset_sizes(model_size: str) -> List[int]:
+#    """Get appropriate dataset sizes for different model scales - Morris et al. scale."""
+#    # Morris et al. uses datasets from 1K to 8M+ samples (Figure 1)
+#    size_map = {
+#        "Tiny": [1000, 5000, 25000, 100000, 500000],
+#        "Mini": [2000, 10000, 50000, 200000, 1000000], 
+#        "Small": [5000, 25000, 100000, 500000, 2000000],
+#        "Medium": [10000, 50000, 250000, 1000000, 4000000],
+#        "Large": [25000, 100000, 500000, 2000000, 8000000],
+#        "XL": [50000, 250000, 1000000, 4000000, 16000000],
+#        "XXL": [100000, 500000, 2000000, 8000000, 32000000],
+#    }
+#    
+#    return size_map.get(model_size, size_map["Small"])
 
 def estimate_execution_time(model_config: Any, training_config: Any, dataset_sizes: List[int], device: str) -> float:
     """Estimate execution time for a model configuration."""
