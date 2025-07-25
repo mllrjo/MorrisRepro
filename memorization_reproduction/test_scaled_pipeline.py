@@ -184,9 +184,8 @@ def create_progressive_model_configs(constraints: Dict[str, Any]) -> List[Tuple[
     print(f"\nSelected {len(viable_configs)} viable configurations")
     return viable_configs
 
-
 def create_scaled_training_config(model_size: str, device: str) -> Any:
-    """Create training configuration appropriate for model size."""
+    """Create training configuration appropriate for model size - FIXED for memorization."""
     
     class ScaledTrainingConfig:
         def __init__(self, batch_size, learning_rate, max_steps, warmup_steps, weight_decay=0.01):
@@ -196,27 +195,29 @@ def create_scaled_training_config(model_size: str, device: str) -> Any:
             self.warmup_steps = warmup_steps
             self.weight_decay = weight_decay
     
-    # Scale training parameters based on model size
+    # MUCH more aggressive training for memorization of random sequences
     config_map = {
-        "Small": {"batch_size": 16, "max_steps": 500, "lr": 1e-3},
-        "Medium": {"batch_size": 12, "max_steps": 800, "lr": 8e-4},
-        "Large": {"batch_size": 8, "max_steps": 1200, "lr": 5e-4},
-        "XL": {"batch_size": 4, "max_steps": 1500, "lr": 3e-4},
-        "XXL": {"batch_size": 2, "max_steps": 2000, "lr": 1e-4},
+        "Tiny": {"batch_size": 16, "max_steps": 5000, "lr": 5e-3},    # 10x more steps, 5x higher LR
+        "Mini": {"batch_size": 12, "max_steps": 8000, "lr": 3e-3},    # 10x more steps, 4x higher LR  
+        "Small": {"batch_size": 16, "max_steps": 10000, "lr": 2e-3},  # 20x more steps, 2x higher LR
+        "Medium": {"batch_size": 12, "max_steps": 15000, "lr": 1e-3}, # 19x more steps
+        "Large": {"batch_size": 8, "max_steps": 20000, "lr": 8e-4},   # 17x more steps
+        "XL": {"batch_size": 4, "max_steps": 25000, "lr": 5e-4},      # 17x more steps
+        "XXL": {"batch_size": 2, "max_steps": 30000, "lr": 3e-4},     # 15x more steps
     }
     
     params = config_map.get(model_size, config_map["Small"])
     
-    # Adjust for device
+    # Adjust for device - but still need substantial training for memorization
     if device == "cpu":
         params["batch_size"] = max(1, params["batch_size"] // 2)  # Smaller batches for CPU
-        params["max_steps"] = min(params["max_steps"], 1000)      # Limit training time
+        params["max_steps"] = max(2000, params["max_steps"] // 2)  # Still need minimum 2K steps
     
     return ScaledTrainingConfig(
         batch_size=params["batch_size"],
         learning_rate=params["lr"],
         max_steps=params["max_steps"],
-        warmup_steps=params["max_steps"] // 10,
+        warmup_steps=params["max_steps"] // 20,  # 5% warmup
         weight_decay=0.01
     )
 
