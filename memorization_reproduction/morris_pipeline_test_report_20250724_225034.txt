@@ -1,0 +1,55 @@
+
+================================================================================
+MORRIS ET AL. MEMORIZATION REPRODUCTION PIPELINE TEST REPORT
+================================================================================
+Test Date: 2025-07-24 22:50:34
+Pipeline Status: ✗ FAILURE
+Total Execution Time: 49.8 seconds
+
+COMPONENT TEST RESULTS:
+- Imports: ✓ PASS
+- Data Generation: ✓ PASS
+- Model Creation: ✓ PASS
+- Training: ✓ PASS
+- Memorization Calculation: ✓ PASS
+- Capacity Estimation: ✓ PASS
+- Visualization: ✓ PASS
+
+CAPACITY ESTIMATION RESULTS:
+- Model Parameters: 659,968
+- Estimated Capacity: 11576.33 bits
+- Bits per Parameter: 0.018
+- Dataset Sizes Tested: [5, 10, 20]
+- Memorization Values: ['3066.0', '6040.3', '11576.3']
+
+MODEL INFORMATION:
+- Models Created: 2
+  Model 1: 659,968 parameters
+  Model 2: 3,683,840 parameters
+
+VALIDATION RESULTS:
+- Models Created: PASS
+- Positive Capacity: PASS
+- Reasonable Bpp: FAIL
+- Memorization Values: PASS
+- Increasing Memorization: PASS
+
+PIPELINE COMPONENTS TESTED:
+✓ Module imports and dependencies
+✓ Device detection and PyTorch setup
+✓ Model configuration and creation
+✓ Synthetic data generation
+✓ Transformer model training
+✓ Memorization calculation methods
+✓ Capacity estimation algorithms
+✓ Visualization generation
+✓ Results validation framework
+
+CONCLUSIONS:
+✗ Pipeline has issues that need to be addressed
+- Check failed component tests above
+- Review error messages in console output
+- Ensure all dependencies are properly installed
+- Some components may need implementation
+
+================================================================================
