@@ -232,15 +232,15 @@ def create_scaled_training_config(model_size: str, device: str) -> Any:
         weight_decay=weight_decay
     )
 
-    def get_scaled_dataset_sizes(model_size: str) -> List[int]:
-        """Dataset sizes appropriate for model capacity."""
-        size_map = {
-            "Debug-Micro": [50, 100, 200, 400, 800],      # Tiny capacity
-            "Debug-Mini": [200, 500, 1000, 2000, 4000],   # Small capacity  
-            "Debug-Small": [500, 1000, 2000, 4000, 8000], # Medium capacity
-            "Debug-Medium": [1000, 2500, 5000, 10000, 20000], # Larger capacity
-        }
-        return size_map.get(model_size, size_map["Debug-Small"])
+def get_scaled_dataset_sizes(model_size: str) -> List[int]:
+    """Dataset sizes appropriate for model capacity."""
+    size_map = {
+        "Debug-Micro": [50, 100, 200, 400, 800],      # Tiny capacity
+        "Debug-Mini": [200, 500, 1000, 2000, 4000],   # Small capacity  
+        "Debug-Small": [500, 1000, 2000, 4000, 8000], # Medium capacity
+        "Debug-Medium": [1000, 2500, 5000, 10000, 20000], # Larger capacity
+    }
+    return size_map.get(model_size, size_map["Debug-Small"])
 
 #def get_scaled_dataset_sizes(model_size: str) -> List[int]:
 #    """Get appropriate dataset sizes for different model scales - Morris et al. scale."""
