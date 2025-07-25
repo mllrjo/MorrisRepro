@@ -248,61 +248,60 @@ def train_model(
     device: str = "cuda"
 ) -> Dict[str, List[float]]:
     """
-    Train transformer model and return training metrics.
+    Train model until convergence with proper termination criteria.
     
-    Args:
-        model: Model to train
-        train_data: Training sequences
-        config: Training configuration
-        device: Device to train on
-        
-    Returns:
-        Dictionary of training metrics (loss, etc.)
+    Termination conditions:
+    1. Loss < memorization_threshold (memorization achieved)
+    2. No improvement for patience steps (plateau)
+    3. max_steps reached (safety fallback)
     """
     model = model.to(device)
     model.train()
     
-    # Handle empty data gracefully
     if not train_data:
         print(f"    WARNING: Empty training data")
-        return {
-            "train_loss": [],
-            "learning_rate": [],
-            "step": []
-        }
+        return {"train_loss": [], "learning_rate": [], "step": []}
     
-    print(f"    Training: {len(train_data)} sequences, {config.max_steps} steps")
+    dataset_size = len(train_data)
+    
+    # CONVERGENCE CRITERIA for memorization
+    memorization_threshold = 0.15  # Near-perfect memorization
+    patience = 2000  # Steps to wait for improvement
+    min_steps = 1000  # Minimum training before early stopping
+    max_steps = config.max_steps  # Safety fallback
+    
+    print(f"    Training: {dataset_size} sequences until convergence (loss < {memorization_threshold}, patience={patience})")
     
     # Create optimizer
     optimizer = optim.Adam(
         model.parameters(),
         lr=config.learning_rate,
         weight_decay=config.weight_decay,
-        betas=(0.9, 0.95)  # Following GPT-2 settings
+        betas=(0.9, 0.95)
     )
     
-    # Create scheduler
+    # Create scheduler (will adjust based on actual steps)
     scheduler = get_linear_warmup_scheduler(
-        optimizer, config.warmup_steps, config.max_steps
+        optimizer, config.warmup_steps, max_steps
     )
     
     # Create dataloader
     dataloader = create_dataloader(train_data, config.batch_size, shuffle=True)
     
-    # Training metrics
-    metrics = {
-        "train_loss": [],
-        "learning_rate": [],
-        "step": []
-    }
-    
+    # Training state
+    metrics = {"train_loss": [], "learning_rate": [], "step": []}
     step = 0
-    total_loss = 0.0
     initial_loss = None
+    best_loss = float('inf')
+    steps_without_improvement = 0
     
-    while step < config.max_steps:
+    # Training loop with convergence checking
+    while step < max_steps:
+        epoch_loss = 0.0
+        epoch_steps = 0
+        
         for batch in dataloader:
-            if step >= config.max_steps:
+            if step >= max_steps:
                 break
                 
             batch = batch.to(device)
@@ -310,7 +309,7 @@ def train_model(
             # Forward pass
             logits = model(batch)
             
-            # Calculate loss (shift for autoregressive prediction)
+            # Calculate loss
             shift_logits = logits[..., :-1, :].contiguous()
             shift_labels = batch[..., 1:].contiguous()
             
@@ -320,40 +319,69 @@ def train_model(
                 reduction='mean'
             )
             
-            # Record initial loss
             if initial_loss is None:
                 initial_loss = loss.item()
             
             # Backward pass
             optimizer.zero_grad()
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)  # Gradient clipping
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimizer.step()
             scheduler.step()
             
-            # Record metrics - LOG MORE FREQUENTLY
+            # Track loss
             current_loss = loss.item()
-            total_loss += current_loss
+            epoch_loss += current_loss
+            epoch_steps += 1
             
-            # Log every 50 steps OR at specific intervals
-            if step % 50 == 0 or step in [10, 25, 100, 500, 1000]:
-                avg_loss = total_loss / max(1, step + 1)
-                metrics["train_loss"].append(current_loss)  # Use current loss, not cumulative average
+            # Log periodically
+            if step % 100 == 0:
+                metrics["train_loss"].append(current_loss)
                 metrics["learning_rate"].append(scheduler.get_last_lr()[0])
                 metrics["step"].append(step)
             
             step += 1
+            
+            # CHECK CONVERGENCE every 100 steps (after minimum training)
+            if step % 100 == 0 and step >= min_steps:
+                avg_recent_loss = epoch_loss / epoch_steps if epoch_steps > 0 else current_loss
+                
+                # CONDITION 1: Memorization achieved
+                if avg_recent_loss < memorization_threshold:
+                    print(f"    CONVERGED: Memorization achieved (loss {avg_recent_loss:.3f} < {memorization_threshold})")
+                    break
+                
+                # CONDITION 2: Check for improvement
+                if avg_recent_loss < best_loss - 0.01:  # Significant improvement
+                    best_loss = avg_recent_loss
+                    steps_without_improvement = 0
+                else:
+                    steps_without_improvement += 100
+                
+                # Early stopping if no improvement
+                if steps_without_improvement >= patience:
+                    print(f"    CONVERGED: No improvement for {patience} steps (loss plateau at {avg_recent_loss:.3f})")
+                    break
+                
+                # Reset for next epoch tracking
+                epoch_loss = 0.0
+                epoch_steps = 0
     
-    # ALWAYS record final metrics
-    final_loss = total_loss / max(1, step) if step > 0 else float('nan')
-    if len(metrics["train_loss"]) == 0 or metrics["step"][-1] != step - 1:
-        metrics["train_loss"].append(final_loss)
-        metrics["learning_rate"].append(scheduler.get_last_lr()[0])
-        metrics["step"].append(step - 1)
+    # Final metrics
+    final_loss = metrics["train_loss"][-1] if metrics["train_loss"] else float('nan')
     
-    print(f"    Training completed: {step} steps, {initial_loss:.3f} → {final_loss:.3f} loss")
+    # Determine termination reason
+    if step >= max_steps:
+        termination_reason = f"MAX_STEPS ({max_steps})"
+    elif final_loss < memorization_threshold:
+        termination_reason = "MEMORIZATION_ACHIEVED"
+    else:
+        termination_reason = "LOSS_PLATEAU"
+    
+    print(f"    Training completed: {step} steps, {initial_loss:.3f} → {final_loss:.3f} loss ({termination_reason})")
     
     return metrics
+
 
 def evaluate_model(
     model: torch.nn.Module,
