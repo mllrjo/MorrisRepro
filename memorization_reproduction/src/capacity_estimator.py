@@ -107,6 +107,14 @@ def estimate_model_capacity(
             # Create and train model
             model = create_gpt_model(model_config)
             training_metrics = train_model(model, data, training_config, device)
+
+            # DEBUG: Check if training worked
+            if training_metrics and "train_loss" in training_metrics:
+                initial_loss = training_metrics["train_loss"][0] if training_metrics["train_loss"] else "unknown"
+                final_loss = training_metrics["train_loss"][-1] if training_metrics["train_loss"] else "unknown"
+                print(f"    Training: {initial_loss:.2f} → {final_loss:.2f} loss")
+            else:
+                print(f"    Training: no loss metrics returned")
             
             # Create reference model (uniform for synthetic data)
             reference_model = create_synthetic_reference_model(
