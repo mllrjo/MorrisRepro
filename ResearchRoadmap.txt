@@ -1,0 +1,135 @@
+# Research Roadmap: Extending Morris Framework
+
+## Overview
+This project extends the Morris et al. memorization framework to:
+1. **State Space Models (SSMs)** instead of transformers
+2. **Power-law correlated binary sequences** as structured synthetic data
+3. Analysis of how data structure affects memorization vs generalization
+
+## Phase 1: Baseline Reproduction (2-3 weeks)
+
+### Minimal Reproduction Targets
+- [ ] Implement core memorization measurement using model likelihoods
+- [ ] Train small transformers (100K-10M params) on uniform random bitstrings  
+- [ ] Reproduce ~3.6 bits-per-parameter capacity estimate
+- [ ] Demonstrate memorization plateau at model capacity
+- [ ] Basic mership inference scaling validation
+
+### Key Implementation Priorities
+1. **Data generation**: Uniform random sequences with controlled entropy
+2. **Kolmogorov approximation**: Using model log-likelihoods for compression
+3. **Cpoapacity measurement**: Training to saturation across dataset sizes
+4. **Reference model**: Larger model for unintended memorization calculation
+
+### Success Criteria
+- Capacity estimates within 10% of Morris et al. (3.2-4.0 bpp)
+- Clear memorizatipon plateau behavior observed
+- Membership inference follows expected scaling trends
+
+## Phase 2: SSM Architecture Extension (2-3 weeks)
+
+### SSM Implementation Strategy
+- [ ] Implement Mamba-style SSM architecture
+- [ ] Match parameter counts with transformer baselines
+- [ ] Apply identical memorization measurement methodology
+- [ ] Compare capacity and memorization characteristics
+
+### Research Questions
+1. **Architecture dependence**: Do SSMs have different bits-per-parameter capacity?
+2. **Memorization patterns**: Different plateau behaviors or double descent?
+3. **Efficiency**: How does linear vs quadratic scaling affect memorization?
+
+### Experimental Design
+- Same dataset sizes and model scales as transformer baseline
+- Direct parameter-matched comparisons
+- Statistical testing across multiple seeds
+
+## Phase 3: Power-Law Correlated Data (3-4 weeks)
+
+### Data Generation Strategy
+- [ ] Implement controllable power-law correlation in binary sequences
+- [ ] Validate correlation structure matches theoretical expectations
+- [ ] Test range of alpha values (0.5 to 3.0)
+
+### Core Research Questions
+1. **Structure vs memorization**: How do correlations change memorization/generalization trade-off?
+2. **Capacity dependence**: Does effective capacity change with data structure?
+3. **Double descent**: How does correlation strength affect the transition point?
+
+### Experimental Matrix
+```
+Alpha values: [0.5, 0.8, 1.0, 1.5, 2.0, 2.5, 3.0, uniform_baseline]
+Model sizes: [500K, 1M, 3M, 8M parameters]
+Dataset sizes: [10^3 to 10^6 samples]
+```
+
+## Phase 4: Analysis and Integration (1-2 weeks)
+
+### Comparative Analysis
+- [ ] Architecture comparison: Transformer vs SSM capacity and scaling
+- [ ] Data structure effects: Power-law correlation impact on memorization
+- [ ] Unified scaling laws: Extensions to Morris framework
+
+### Deliverables
+- [ ] Technical report with findings
+- [ ] Code repository with reproduced experiments
+- [ ] Scaling law extensions and new insights
+
+---
+
+## Implementation Strategy
+
+### Modular Development Approach
+```
+morris_extension/
+├── data/
+│   ├── uniform_random.py      # Morris baseline data
+│   ├── power_law.py           # Power-law correlated sequences  
+│   └── validation.py          # Data structure validation
+├── models/
+│   ├── transformer.py         # GPT-style implementation
+│   ├── ssm.py                 # Mamba-style SSM
+│   └── base.py               # Common interfaces
+├── memorization/
+│   ├── measurement.py         # Core Kolmogorov approximation
+│   ├── capacity.py           # Model capacity estimation
+│   └── inference.py          # Membership inference attacks
+├── experiments/
+│   ├── reproduction.py        # Morris baseline reproduction
+│   ├── architecture_comparison.py
+│   └── power_law_analysis.py
+└── analysis/
+    ├── scaling_laws.py
+    ├── visualization.py
+    └── reporting.py
+```
+
+### Resource Requirements
+- **Compute**: Small-scale experiments (single GPU sufficient)
+- **Models**: 100K to 20M parameter range (manageable training times)
+- **Data**: Synthetic generation (no large dataset dependencies)
+
+### Risk Mitigation
+1. **Reproduction failure**: Start with simplified Morris reproduction
+2. **SSM complexity**: Begin with basic SSM, expand if needed  
+3. **Power-law generation**: Validate correlation structure carefully
+4. **Scaling**: Start small-scale, expand systematically
+
+---
+
+## Expected Contributions
+
+### Methodological
+- Extension of Morris framework to new architectures
+- Systematic study of data structure effects on memorization
+- Validation of capacity measurements across architectures
+
+### Theoretical Insights  
+- Architecture-specific memorization characteristics
+- Role of data correlations in memorization vs generalization
+- Generalized scaling laws for structured data
+
+### Practical Applications
+- Guide model selection for privacy-sensitive applications
+- Inform data preprocessing strategies
+- Advance understanding of model capacity utilization
