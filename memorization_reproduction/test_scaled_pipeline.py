@@ -128,28 +128,36 @@ def create_progressive_model_configs(constraints: Dict[str, Any]) -> List[Tuple[
             return total
     
     # Define progressive model configurations - start smaller for constrained systems
+    # Define progressive model configurations - DEBUG SIZES
     model_configs = [
-        # Tiny (for very constrained systems)
-        ("Tiny", 2, 128, 4, 1000, 64),
-        
-        # Mini (slightly larger)
-        ("Mini", 3, 192, 6, 1500, 96),
-        
-        # Small (baseline)
-        ("Small", 4, 256, 8, 2048, 128),
-        
-        # Medium (~10M parameters)
-        ("Medium", 6, 512, 8, 2048, 128),
-        
-        # Large (~50M parameters) 
-        ("Large", 12, 768, 12, 4096, 128),
-        
-        # Extra Large (~100M parameters)
-        ("XL", 18, 1024, 16, 4096, 128),
-        
-        # XXL (~200M parameters)
-        ("XXL", 24, 1280, 20, 8192, 128),
+        # Ultra-small models for debugging memorization mechanism
+        ("Debug-Micro", 1, 32, 2, 256, 32),    # ~8K parameters
+        ("Debug-Mini", 1, 64, 4, 512, 32),     # ~35K parameters  
+        ("Debug-Small", 2, 64, 4, 512, 32),    # ~70K parameters
+        ("Debug-Medium", 2, 128, 8, 1024, 64), # ~280K parameters
     ]
+#    model_configs = [
+#        # Tiny (for very constrained systems)
+#        ("Tiny", 2, 128, 4, 1000, 64),
+#        
+#        # Mini (slightly larger)
+#        ("Mini", 3, 192, 6, 1500, 96),
+#        
+#        # Small (baseline)
+#        ("Small", 4, 256, 8, 2048, 128),
+#        
+#        # Medium (~10M parameters)
+#        ("Medium", 6, 512, 8, 2048, 128),
+#        
+#        # Large (~50M parameters) 
+#        ("Large", 12, 768, 12, 4096, 128),
+#        
+#        # Extra Large (~100M parameters)
+#        ("XL", 18, 1024, 16, 4096, 128),
+#        
+#        # XXL (~200M parameters)
+#        ("XXL", 24, 1280, 20, 8192, 128),
+#    ]
     
     # Filter configs based on system constraints
     max_params = constraints['recommended_max_params']
