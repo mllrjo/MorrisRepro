@@ -240,7 +240,6 @@ def get_linear_warmup_scheduler(
             return 0.5 * (1.0 + math.cos(math.pi * progress))
     
     return optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
-
 def train_model(
     model: torch.nn.Module,
     train_data: List[torch.Tensor],
@@ -266,7 +265,10 @@ def train_model(
     
     # DATASET-AWARE LEARNING RATE SCALING
     # Larger datasets can handle higher learning rates due to gradient stability
-    dataset_scale = min(5.0, dataset_size / 1000.0)  # Linear scaling up to 5x
+    if dataset_size >= 1000:
+        dataset_scale = min(5.0, (dataset_size / 1000.0) ** 0.5)  # sqrt scaling up for large datasets
+    else:
+        dataset_scale = 1.0  # Normal LR for small datasets (don't scale down)
     scaled_lr = config.learning_rate * dataset_scale
     
     # CONVERGENCE CRITERIA for memorization
