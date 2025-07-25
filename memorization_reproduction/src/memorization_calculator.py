@@ -160,7 +160,10 @@ def calculate_unintended_memorization(
     
     # Unintended memorization is the improvement from using target model
     unintended_memorization = ref_compression - joint_compression
-    
+
+    # DEBUG: Show compression values
+    print(f"    Debug: ref_compression={ref_compression:.1f}, joint_compression={joint_compression:.1f}, memorization={unintended_memorization:.1f}")
+   
     # Ensure non-negative (cannot have negative memorization)
     unintended_memorization = max(0.0, unintended_memorization)
     
