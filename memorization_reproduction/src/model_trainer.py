@@ -241,7 +241,6 @@ def get_linear_warmup_scheduler(
     
     return optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
 
-
 def train_model(
     model: torch.nn.Module,
     train_data: List[torch.Tensor],
@@ -265,11 +264,14 @@ def train_model(
     
     # Handle empty data gracefully
     if not train_data:
+        print(f"    WARNING: Empty training data")
         return {
             "train_loss": [],
             "learning_rate": [],
             "step": []
         }
+    
+    print(f"    Training: {len(train_data)} sequences, {config.max_steps} steps")
     
     # Create optimizer
     optimizer = optim.Adam(
@@ -296,6 +298,7 @@ def train_model(
     
     step = 0
     total_loss = 0.0
+    initial_loss = None
     
     while step < config.max_steps:
         for batch in dataloader:
@@ -317,6 +320,10 @@ def train_model(
                 reduction='mean'
             )
             
+            # Record initial loss
+            if initial_loss is None:
+                initial_loss = loss.item()
+            
             # Backward pass
             optimizer.zero_grad()
             loss.backward()
@@ -324,19 +331,29 @@ def train_model(
             optimizer.step()
             scheduler.step()
             
-            # Record metrics
-            total_loss += loss.item()
+            # Record metrics - LOG MORE FREQUENTLY
+            current_loss = loss.item()
+            total_loss += current_loss
             
-            if step % 100 == 0:  # Log every 100 steps
+            # Log every 50 steps OR at specific intervals
+            if step % 50 == 0 or step in [10, 25, 100, 500, 1000]:
                 avg_loss = total_loss / max(1, step + 1)
-                metrics["train_loss"].append(avg_loss)
+                metrics["train_loss"].append(current_loss)  # Use current loss, not cumulative average
                 metrics["learning_rate"].append(scheduler.get_last_lr()[0])
                 metrics["step"].append(step)
             
             step += 1
     
+    # ALWAYS record final metrics
+    final_loss = total_loss / max(1, step) if step > 0 else float('nan')
+    if len(metrics["train_loss"]) == 0 or metrics["step"][-1] != step - 1:
+        metrics["train_loss"].append(final_loss)
+        metrics["learning_rate"].append(scheduler.get_last_lr()[0])
+        metrics["step"].append(step - 1)
+    
+    print(f"    Training completed: {step} steps, {initial_loss:.3f} → {final_loss:.3f} loss")
+    
     return metrics
-
 
 def evaluate_model(
     model: torch.nn.Module,
