@@ -185,7 +185,7 @@ def create_progressive_model_configs(constraints: Dict[str, Any]) -> List[Tuple[
     return viable_configs
 
 def create_scaled_training_config(model_size: str, device: str) -> Any:
-    """Create training configuration for MEMORIZING random sequences - ULTRA AGGRESSIVE."""
+    """EXTREME memorization training - get loss from 6.9 → 0.1"""
     
     class ScaledTrainingConfig:
         def __init__(self, batch_size, learning_rate, max_steps, warmup_steps, weight_decay=0.01):
@@ -195,35 +195,34 @@ def create_scaled_training_config(model_size: str, device: str) -> Any:
             self.warmup_steps = warmup_steps
             self.weight_decay = weight_decay
     
-    # ULTRA AGGRESSIVE for random sequence memorization
+    # EXTREME settings for random sequence memorization  
     config_map = {
-        "Tiny": {"batch_size": 32, "max_steps": 10000, "lr": 1e-2},   # 10x higher LR
-        "Mini": {"batch_size": 32, "max_steps": 12000, "lr": 8e-3},   # 8x higher LR  
-        "Small": {"batch_size": 32, "max_steps": 15000, "lr": 5e-3},  # 5x higher LR
-        "Medium": {"batch_size": 32, "max_steps": 20000, "lr": 3e-3}, # 3x higher LR
-        "Large": {"batch_size": 32, "max_steps": 25000, "lr": 2e-3},  # 2x higher LR
-        "XL": {"batch_size": 32, "max_steps": 30000, "lr": 1e-3},     # Higher LR
-        "XXL": {"batch_size": 32, "max_steps": 35000, "lr": 8e-4},    # Higher LR
+        "Tiny": {"batch_size": 64, "max_steps": 25000, "lr": 2e-2},   # 20x higher LR, 2.5x more steps
+        "Mini": {"batch_size": 64, "max_steps": 30000, "lr": 1.5e-2}, # 15x higher LR  
+        "Small": {"batch_size": 64, "max_steps": 35000, "lr": 1e-2},  # 10x higher LR
+        "Medium": {"batch_size": 64, "max_steps": 40000, "lr": 8e-3}, # 8x higher LR
+        "Large": {"batch_size": 64, "max_steps": 45000, "lr": 5e-3},  # 5x higher LR
+        "XL": {"batch_size": 64, "max_steps": 50000, "lr": 3e-3},     # 3x higher LR
+        "XXL": {"batch_size": 64, "max_steps": 55000, "lr": 2e-3"},   # 2x higher LR
     }
     
     params = config_map.get(model_size, config_map["Small"])
     
-    # Reduce weight decay for memorization (prevents overfitting)
-    weight_decay = 0.001  # Much lower weight decay
+    # Minimal weight decay - we WANT overfitting for memorization
+    weight_decay = 0.0001  # Almost no regularization
     
-    # Adjust for device - but keep aggressive settings
+    # Adjust for device 
     if device == "cpu":
-        params["batch_size"] = max(16, params["batch_size"] // 2)  # Still reasonable batch size
-        params["max_steps"] = max(5000, params["max_steps"] // 2)  # Still substantial training
+        params["batch_size"] = max(32, params["batch_size"] // 2)  
+        params["max_steps"] = max(15000, params["max_steps"] // 2)  # Still very aggressive
     
     return ScaledTrainingConfig(
         batch_size=params["batch_size"],
         learning_rate=params["lr"],
         max_steps=params["max_steps"],
-        warmup_steps=params["max_steps"] // 50,  # Minimal warmup - get to high LR fast
+        warmup_steps=params["max_steps"] // 100,  # Tiny warmup - get to high LR immediately
         weight_decay=weight_decay
     )
-
 
 def get_scaled_dataset_sizes(model_size: str) -> List[int]:
     """Get appropriate dataset sizes for different model scales - Morris et al. scale."""
