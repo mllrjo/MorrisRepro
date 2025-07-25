@@ -79,10 +79,6 @@ def estimate_model_capacity(
     all_memorization_values = []
     all_results = []
     
-    # Display progressive testing
-    model_params = count_parameters(create_gpt_model(model_config))
-    print(f"Testing {len(dataset_sizes)} dataset sizes for model with {model_params:,} parameters:")
-    
     # Run experiments across seeds for statistical robustness
     for seed in range(n_seeds):
         torch.manual_seed(seed)
@@ -90,9 +86,7 @@ def estimate_model_capacity(
         
         memorization_values = []
         
-        for i, dataset_size in enumerate(dataset_sizes):
-            print(f"  Dataset {dataset_size:,} samples (#{i+1}/{len(dataset_sizes)})... ", end="", flush=True)
-            
+        for dataset_size in dataset_sizes:
             # Generate uniform random data (no generalization possible)
             # Use model's max_seq_length to avoid embedding errors
             seq_length = min(64, model_config.max_seq_length)  # Morris et al. uses 64, but respect model limits
@@ -120,10 +114,6 @@ def estimate_model_capacity(
             
             memorization_values.append(total_memorization)
             
-            # Display result
-            bits_per_param = total_memorization / model_params
-            print(f"Memorization: {total_memorization:,.0f} bits ({bits_per_param:.3f} bits/param)")
-            
             # Store detailed results
             result = CapacityExperimentResult(
                 model_params=count_parameters(model),
@@ -147,9 +137,6 @@ def estimate_model_capacity(
         dataset_sizes, avg_memorization_values, plateau_tolerance
     )
     
-    # Display plateau detection results
-    print(f"  Plateau detected at dataset size: {plateau_size:,} (confidence: {plateau_confidence:.2f})")
-    
     # Estimate capacity as plateau value
     estimated_capacity = np.max(avg_memorization_values)
     
@@ -161,8 +148,6 @@ def estimate_model_capacity(
     r_squared = calculate_plateau_fit_quality(
         dataset_sizes, avg_memorization_values, plateau_size
     )
-    
-    print(f"  Final capacity estimate: {estimated_capacity:,.0f} bits ({bits_per_parameter:.3f} bits/param)")
     
     return CapacityEstimate(
         estimated_capacity_bits=estimated_capacity,
@@ -390,8 +375,7 @@ def run_capacity_experiments(
         Dictionary with experiment results and scaling law analysis
     """
     if base_dataset_sizes is None:
-        # Use Morris et al. scale: up to 8M samples (Figure 1)
-        base_dataset_sizes = [1000, 5000, 25000, 100000, 500000, 1000000, 2000000, 4000000, 8000000]
+        base_dataset_sizes = [100, 500, 1000, 2000, 5000, 10000, 20000, 50000]
     
     all_results = []
     capacity_estimates = []
@@ -405,14 +389,9 @@ def run_capacity_experiments(
         # Scale dataset sizes based on expected model capacity
         # Larger models need larger datasets to reach plateau
         model_param_count = count_parameters(create_gpt_model(model_config))
-        
-        # Aggressive scaling: larger models need exponentially more data
-        scale_factor = max(1.0, (model_param_count / 100000) ** 1.5)
+        scale_factor = max(1.0, model_param_count / 100000)  # Scale for models > 100K params
         
         scaled_dataset_sizes = [int(size * scale_factor) for size in base_dataset_sizes]
-        
-        print(f"Dataset sizes for {model_param_count:,} parameter model: "
-              f"{scaled_dataset_sizes[0]:,} to {scaled_dataset_sizes[-1]:,} samples")
         
         # Estimate capacity for this model
         capacity_estimate = estimate_model_capacity(
@@ -445,11 +424,6 @@ def run_capacity_experiments(
     bits_per_param_values = [cap / size for cap, size in zip(estimated_capacities, model_sizes)]
     mean_bits_per_param = np.mean(bits_per_param_values)
     std_bits_per_param = np.std(bits_per_param_values)
-    
-    print(f"\nScaling Law Results:")
-    print(f"Mean bits-per-parameter: {mean_bits_per_param:.3f} (target: 3.6)")
-    print(f"Standard deviation: {std_bits_per_param:.3f}")
-    print(f"Linear fit R²: {r_squared:.3f}")
     
     return {
         'individual_results': all_results,
