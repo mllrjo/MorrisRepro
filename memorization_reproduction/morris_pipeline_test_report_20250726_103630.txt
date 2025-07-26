@@ -1,0 +1,60 @@
+
+================================================================================
+MORRIS ET AL. MEMORIZATION REPRODUCTION PIPELINE TEST REPORT
+================================================================================
+Test Date: 2025-07-26 10:36:30
+Pipeline Status: ✓ SUCCESS
+Total Execution Time: 54.1 seconds
+
+COMPONENT TEST RESULTS:
+- Imports: ✓ PASS
+- Data Generation: ✓ PASS
+- Model Creation: ✓ PASS
+- Training: ✓ PASS
+- Memorization Calculation: ✓ PASS
+- Capacity Estimation: ✓ PASS
+- Visualization: ✓ PASS
+
+CAPACITY ESTIMATION RESULTS:
+- Model Parameters: 659,968
+- Estimated Capacity: 11576.33 bits
+- Bits per Parameter: 0.018
+- Dataset Sizes Tested: [5, 10, 20]
+- Memorization Values: ['3066.0', '6040.3', '11576.3']
+- Model Sizes in Results: [659968]
+- Individual Results Count: 1
+
+MODEL INFORMATION:
+- Models Created: 2
+  Model 1: 659,968 parameters
+  Model 2: 3,683,840 parameters
+
+VALIDATION RESULTS:
+- Models Created: PASS
+- Positive Capacity: PASS
+- Reasonable Bpp For Test Scale: PASS
+- Memorization Values: PASS
+- Has Model Sizes: PASS
+- Has Individual Results: PASS
+- Scaling Law Present: PASS
+- Increasing Memorization: PASS
+
+PIPELINE COMPONENTS TESTED:
+✓ Module imports and dependencies
+✓ Device detection and PyTorch setup
+✓ Model configuration and creation
+✓ Synthetic data generation
+✓ Transformer model training
+✓ Memorization calculation methods
+✓ Capacity estimation algorithms
+✓ Visualization generation
+✓ Results validation framework
+
+CONCLUSIONS:
+✓ Core pipeline is functional for Morris reproduction
+✓ Transformer models can be created and trained
+✓ Memorization calculation methods working
+✓ Capacity estimation producing reasonable results
+✓ Ready for full-scale experiments
+
+================================================================================

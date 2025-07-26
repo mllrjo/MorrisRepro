@@ -1,0 +1,10 @@
+Morris-Micro Validation Results
+Date: 2025-07-26 12:49:00.082928
+Parameters: 1,602,144
+Capacity: 199,060 bits
+Bits/Parameter: 0.124
+Morris Progress: 3.5%
+R²: 0.000
+Time: 0.27 hours
+Success: False
+Dataset Sizes: [12, 36, 72, 144, 288]
