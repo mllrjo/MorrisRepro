@@ -24,6 +24,7 @@ from memorization_calculator import (
     validate_memorization_calculation
 )
 from data_generator import generate_uniform_bitstrings, create_dataset_size_series
+from enhanced_model_trainer import enhanced_train_model_wrapper
 
 
 @dataclass
@@ -106,7 +107,14 @@ def estimate_model_capacity(
             
             # Create and train model
             model = create_gpt_model(model_config)
-            training_metrics = train_model(model, data, training_config, device)
+            training_metrics = enhanced_train_model_wrapper(
+                model=model,
+                train_data=data,
+                original_config=training_config,
+                device=device,
+                enable_enhanced_training=True
+            )
+
 
             # DEBUG: Check if training worked
             if training_metrics and "train_loss" in training_metrics:

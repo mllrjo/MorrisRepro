@@ -363,13 +363,14 @@ def calculate_memorization_rate(
     model.train()
     return memorized_count / max(len(sequences), 1)
 
-
 def enhanced_train_model_wrapper(
     model: torch.nn.Module,
     train_data: List[torch.Tensor],
     original_config: Any,
     device: str = "cuda",
-    enable_enhanced_training: bool = True
+    enable_enhanced_training: bool = True,
+    memorization_threshold: float = 0.15,
+    memorization_check_interval: int = 500
 ) -> Dict[str, Any]:
     """
     Drop-in replacement for existing train_model function.
@@ -384,38 +385,40 @@ def enhanced_train_model_wrapper(
             weight_decay=getattr(original_config, 'weight_decay', 0.01),
             max_steps=max(getattr(original_config, 'max_steps', 35000), 100000),  # Ensure minimum 100k
             warmup_steps=getattr(original_config, 'warmup_steps', 1000),
-            memorization_threshold=0.15,
+            memorization_threshold=memorization_threshold,  # Use parameter
+            memorization_check_interval=memorization_check_interval,  # Use parameter
             patience=8000
         )
         
         print("Using enhanced training with improved convergence detection")
-        return adaptive_memorization_training(model, train_data, enhanced_config, device)
+        raw_results = adaptive_memorization_training(model, train_data, enhanced_config, device)
+        
+        # Format results to match test expectations
+        convergence_info = raw_results.get('convergence_info', {})
+        final_status = convergence_info.get('reason', 'UNKNOWN')
+        
+        return {
+            # Original format (backward compatibility)
+            'loss': raw_results.get('loss', []),
+            'train_loss': raw_results.get('train_loss', []),
+            'learning_rate': raw_results.get('learning_rate', []),
+            'memorization_rate': raw_results.get('memorization_rate', []),
+            'memorization_history': raw_results.get('memorization_rate', []),
+            'steps': raw_results.get('steps', []),
+            'convergence_info': convergence_info,
+            
+            # Test-expected format
+            'final_status': final_status,
+            'total_steps': convergence_info.get('final_step', len(raw_results.get('loss', []))),
+            'final_loss': convergence_info.get('final_loss', raw_results.get('loss', [0])[-1] if raw_results.get('loss') else 0.0),
+            'final_memorization_rate': raw_results.get('memorization_rate', [0])[-1] if raw_results.get('memorization_rate') else 0.0,
+            'convergence_achieved': convergence_info.get('converged', False)
+        }
     
     else:
         # Fallback to original training (not implemented here)
         print("Enhanced training disabled - using original training")
         raise NotImplementedError("Original training fallback not implemented - enhanced training required")
-
-
-def create_enhanced_config_from_original(
-    original_config: Any,
-    memorization_threshold: float = 0.15,
-    max_steps: int = 100_000,
-    **enhanced_kwargs
-) -> EnhancedTrainingConfig:
-    """
-    Create EnhancedTrainingConfig from existing TrainingConfig.
-    """
-    return EnhancedTrainingConfig(
-        batch_size=getattr(original_config, 'batch_size', 16),
-        learning_rate=getattr(original_config, 'learning_rate', 1e-3),
-        weight_decay=getattr(original_config, 'weight_decay', 0.01),
-        max_steps=max(getattr(original_config, 'max_steps', 35000), max_steps),
-        warmup_steps=getattr(original_config, 'warmup_steps', 1000),
-        memorization_threshold=memorization_threshold,
-        **enhanced_kwargs
-    )
-
 
 if __name__ == "__main__":
     print("Enhanced Training Module for Morris Memorization Reproduction")

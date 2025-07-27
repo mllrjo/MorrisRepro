@@ -1,0 +1,5 @@
+
+MORRIS REPRODUCTION ATTEMPT FAILED
+Date: 2025-07-26 21:59:26
+Model: Morris-Small
+Error: estimate_model_capacity() got an unexpected keyword argument 'use_weightwatcher'
