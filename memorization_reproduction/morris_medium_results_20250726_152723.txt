@@ -1,0 +1,11 @@
+Morris-Medium Validation Results
+Date: 2025-07-26 15:27:23.571190
+Parameters: 7,383,552
+Capacity: 827,015 bits
+Bits/Parameter: 0.112
+Scaling Efficiency: 0.2x
+Morris Progress: 3.1%
+R²: 0.000
+Time: 1.99 hours
+Success: False
+Dataset Sizes: [25, 75, 150, 300, 600, 1200]

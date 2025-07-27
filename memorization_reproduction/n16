@@ -1,0 +1,54 @@
+✅ Enhanced training available - using improved convergence detection
+Binary Enhanced Training Fix
+Applying discovered optimal settings
+================
+🧪 TESTING: Binary Memorization Fix
+Testing the case that was failing before...
+================
+Dataset: 16 sequences × 16 bits = 256 total bits
+Model: 101,376 parameters
+Ratio: 0.0025 bits/param (was failing)
+
+Training with FIXED binary settings...
+🔧 Using BINARY-OPTIMIZED enhanced training
+   Learning rate: 0.01 (10x higher)
+   Weight decay: 0.0 (disabled)
+   Using existing enhanced training interface
+Using enhanced training with improved convergence detection
+Starting enhanced training with 16 sequences
+Target: loss < 0.15, max steps: 100000
+Step      0: Loss 0.7043, LR 1.00e-04, Time 0.0s
+         Memorization rate: 0.000
+Step   1000: Loss 0.5082, LR 1.00e-02, Time 11.9s
+         Memorization rate: 0.000
+Step   2000: Loss 0.5414, LR 1.00e-02, Time 24.0s
+         Memorization rate: 0.000
+Step   3000: Loss 0.3436, LR 1.00e-02, Time 36.0s
+         Memorization rate: 0.000
+Step   4000: Loss 0.4873, LR 1.00e-02, Time 48.0s
+         Memorization rate: 0.000
+Step   5000: Loss 0.4131, LR 1.00e-02, Time 60.5s
+         Memorization rate: 0.000
+Step   6000: Loss 0.4122, LR 1.00e-02, Time 72.6s
+         Memorization rate: 0.062
+Step   7000: Loss 0.2436, LR 1.00e-02, Time 84.6s
+         Memorization rate: 0.375
+Step   8000: Loss 0.4145, LR 1.00e-02, Time 96.7s
+         Memorization rate: 0.000
+Step   9000: Loss 0.2010, LR 1.00e-02, Time 109.2s
+         Memorization rate: 0.188
+CONVERGED: MEMORIZATION_ACHIEVED at step 9026
+Final loss: 0.1460
+Final memorization rate: 0.188
+Training completed in 109.5 seconds
+
+📊 FIXED RESULTS:
+   Training time: 110.3 seconds
+   Final loss: inf
+   Converged: False
+   Status: unknown
+❌ Still not working - needs more investigation
+   Expected: Loss < 0.05 and convergence
+   Actual: Loss = inf, Converged = False
+
+❌ Basic fix failed - need more debugging

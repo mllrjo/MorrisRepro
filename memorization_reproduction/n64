@@ -1,0 +1,233 @@
+✅ Enhanced training available - using improved convergence detection
+Binary Enhanced Training Fix
+Applying discovered optimal settings
+================================================================
+🧪 TESTING: Binary Memorization Fix
+Testing the case that was failing before...
+================================================================
+Dataset: 64 sequences × 16 bits = 1024 total bits
+Model: 101,376 parameters
+Ratio: 0.0101 bits/param (was failing)
+
+Training with FIXED binary settings...
+🔧 Using BINARY-OPTIMIZED enhanced training
+   Learning rate: 0.01 (10x higher)
+   Weight decay: 0.0 (disabled)
+   Using existing enhanced training interface
+Using enhanced training with improved convergence detection
+Starting enhanced training with 64 sequences
+Target: loss < 0.15, max steps: 100000
+Step      0: Loss 0.7202, LR 1.00e-04, Time 0.1s
+         Memorization rate: 0.000
+Step   1000: Loss 0.6857, LR 1.00e-02, Time 11.5s
+         Memorization rate: 0.000
+Step   2000: Loss 0.7039, LR 1.00e-02, Time 22.9s
+         Memorization rate: 0.000
+Step   3000: Loss 0.6570, LR 1.00e-02, Time 35.1s
+         Memorization rate: 0.000
+Step   4000: Loss 0.6790, LR 1.00e-02, Time 46.9s
+         Memorization rate: 0.000
+Step   5000: Loss 0.6506, LR 1.00e-02, Time 58.9s
+         Memorization rate: 0.000
+Step   6000: Loss 0.6807, LR 1.00e-02, Time 71.0s
+         Memorization rate: 0.000
+Step   7000: Loss 0.6676, LR 1.00e-02, Time 83.1s
+         Memorization rate: 0.000
+Step   8000: Loss 0.7063, LR 1.00e-02, Time 95.3s
+         Memorization rate: 0.000
+Step   9000: Loss 0.6978, LR 1.00e-02, Time 107.5s
+         Memorization rate: 0.000
+Step  10000: Loss 0.6703, LR 1.00e-02, Time 120.1s
+         Memorization rate: 0.000
+Step  11000: Loss 0.6636, LR 1.00e-02, Time 132.2s
+         Memorization rate: 0.000
+Step  12000: Loss 0.6901, LR 1.00e-02, Time 144.3s
+         Memorization rate: 0.000
+Step  13000: Loss 0.6231, LR 1.00e-02, Time 156.8s
+         Memorization rate: 0.000
+Step  14000: Loss 0.6129, LR 1.00e-02, Time 168.7s
+         Memorization rate: 0.000
+Step  15000: Loss 0.6483, LR 1.00e-02, Time 180.9s
+         Memorization rate: 0.000
+Step  16000: Loss 0.6622, LR 1.00e-02, Time 193.2s
+         Memorization rate: 0.000
+Step  17000: Loss 0.6641, LR 1.00e-02, Time 205.3s
+         Memorization rate: 0.000
+Step  18000: Loss 0.6485, LR 1.00e-02, Time 217.4s
+         Memorization rate: 0.000
+Step  19000: Loss 0.6640, LR 1.00e-02, Time 229.4s
+         Memorization rate: 0.000
+Step  20000: Loss 0.6772, LR 1.00e-02, Time 241.6s
+         Memorization rate: 0.000
+Step  21000: Loss 0.6190, LR 1.00e-02, Time 253.5s
+         Memorization rate: 0.000
+Step  22000: Loss 0.6694, LR 1.00e-02, Time 265.5s
+         Memorization rate: 0.000
+Step  23000: Loss 0.7237, LR 1.00e-02, Time 277.7s
+         Memorization rate: 0.000
+Step  24000: Loss 0.6654, LR 1.00e-02, Time 290.5s
+         Memorization rate: 0.000
+Step  25000: Loss 0.6305, LR 1.00e-02, Time 304.2s
+         Memorization rate: 0.000
+Step  26000: Loss 0.6419, LR 1.00e-02, Time 318.4s
+         Memorization rate: 0.000
+Step  27000: Loss 0.6453, LR 1.00e-02, Time 331.8s
+         Memorization rate: 0.000
+Step  28000: Loss 0.6486, LR 1.00e-02, Time 345.2s
+         Memorization rate: 0.000
+Step  29000: Loss 0.6410, LR 1.00e-02, Time 358.9s
+         Memorization rate: 0.000
+Step  30000: Loss 0.6109, LR 1.00e-02, Time 372.5s
+         Memorization rate: 0.000
+Step  31000: Loss 0.6193, LR 1.00e-02, Time 386.0s
+         Memorization rate: 0.000
+Step  32000: Loss 0.6218, LR 1.00e-02, Time 399.6s
+         Memorization rate: 0.000
+Step  33000: Loss 0.6106, LR 1.00e-02, Time 413.0s
+         Memorization rate: 0.000
+Step  34000: Loss 0.6337, LR 1.00e-02, Time 426.4s
+         Memorization rate: 0.000
+Step  35000: Loss 0.5766, LR 1.00e-02, Time 439.8s
+         Memorization rate: 0.000
+Step  36000: Loss 0.5731, LR 1.00e-02, Time 454.3s
+         Memorization rate: 0.000
+Step  37000: Loss 0.5450, LR 1.00e-02, Time 467.6s
+         Memorization rate: 0.000
+Step  38000: Loss 0.5114, LR 1.00e-02, Time 481.5s
+         Memorization rate: 0.000
+Step  39000: Loss 0.5159, LR 1.00e-02, Time 494.9s
+         Memorization rate: 0.000
+Step  40000: Loss 0.5556, LR 1.00e-02, Time 508.1s
+         Memorization rate: 0.000
+Step  41000: Loss 0.5153, LR 1.00e-02, Time 521.5s
+         Memorization rate: 0.000
+Step  42000: Loss 0.4172, LR 1.00e-02, Time 534.9s
+         Memorization rate: 0.000
+Step  43000: Loss 0.3440, LR 1.00e-02, Time 548.0s
+         Memorization rate: 0.000
+Step  44000: Loss 0.3888, LR 1.00e-02, Time 561.3s
+         Memorization rate: 0.016
+Step  45000: Loss 0.5060, LR 1.00e-02, Time 574.9s
+         Memorization rate: 0.000
+Step  46000: Loss 0.4381, LR 1.00e-02, Time 587.9s
+         Memorization rate: 0.000
+Step  47000: Loss 0.4834, LR 1.00e-02, Time 601.0s
+         Memorization rate: 0.000
+Step  48000: Loss 0.4656, LR 1.00e-02, Time 618.1s
+         Memorization rate: 0.000
+Step  49000: Loss 0.5458, LR 1.00e-02, Time 643.5s
+         Memorization rate: 0.000
+Step  50000: Loss 0.4763, LR 1.00e-02, Time 667.4s
+         Memorization rate: 0.000
+Step  51000: Loss 0.5454, LR 1.00e-02, Time 691.0s
+         Memorization rate: 0.000
+Step  52000: Loss 0.4596, LR 1.00e-02, Time 714.9s
+         Memorization rate: 0.000
+Step  53000: Loss 0.4447, LR 1.00e-02, Time 738.6s
+         Memorization rate: 0.000
+Step  54000: Loss 0.4853, LR 1.00e-02, Time 762.5s
+         Memorization rate: 0.000
+Step  55000: Loss 0.3653, LR 1.00e-02, Time 786.6s
+         Memorization rate: 0.000
+Step  56000: Loss 0.4639, LR 1.00e-02, Time 810.2s
+         Memorization rate: 0.000
+Step  57000: Loss 0.5281, LR 1.00e-02, Time 830.5s
+         Memorization rate: 0.000
+Step  58000: Loss 0.5264, LR 1.00e-02, Time 843.2s
+         Memorization rate: 0.000
+Step  59000: Loss 0.5306, LR 1.00e-02, Time 856.7s
+         Memorization rate: 0.000
+Step  60000: Loss 0.4195, LR 1.00e-02, Time 869.9s
+         Memorization rate: 0.000
+Step  61000: Loss 0.4100, LR 1.00e-02, Time 884.6s
+         Memorization rate: 0.000
+Step  62000: Loss 0.4448, LR 1.00e-02, Time 898.1s
+         Memorization rate: 0.000
+Step  63000: Loss 0.5260, LR 1.00e-02, Time 911.4s
+         Memorization rate: 0.000
+Step  64000: Loss 0.4577, LR 1.00e-02, Time 924.7s
+         Memorization rate: 0.000
+Step  65000: Loss 0.4033, LR 1.00e-02, Time 937.9s
+         Memorization rate: 0.000
+Step  66000: Loss 0.4711, LR 1.00e-02, Time 951.3s
+         Memorization rate: 0.000
+Step  67000: Loss 0.4466, LR 1.00e-02, Time 964.5s
+         Memorization rate: 0.000
+Step  68000: Loss 0.4739, LR 1.00e-02, Time 977.7s
+         Memorization rate: 0.000
+Step  69000: Loss 0.3877, LR 1.00e-02, Time 991.0s
+         Memorization rate: 0.000
+Step  70000: Loss 0.4356, LR 1.00e-02, Time 1004.1s
+         Memorization rate: 0.000
+Step  71000: Loss 0.4732, LR 1.00e-02, Time 1017.9s
+         Memorization rate: 0.000
+Step  72000: Loss 0.3447, LR 1.00e-02, Time 1031.2s
+         Memorization rate: 0.000
+Step  73000: Loss 0.3719, LR 1.00e-02, Time 1044.5s
+         Memorization rate: 0.000
+Step  74000: Loss 0.4177, LR 1.00e-02, Time 1057.5s
+         Memorization rate: 0.000
+Step  75000: Loss 0.5064, LR 1.00e-02, Time 1070.9s
+         Memorization rate: 0.000
+Step  76000: Loss 0.4489, LR 1.00e-02, Time 1085.2s
+         Memorization rate: 0.000
+Step  77000: Loss 0.4822, LR 1.00e-02, Time 1098.9s
+         Memorization rate: 0.000
+Step  78000: Loss 0.3057, LR 1.00e-02, Time 1112.6s
+         Memorization rate: 0.000
+Step  79000: Loss 0.2839, LR 1.00e-02, Time 1125.5s
+         Memorization rate: 0.000
+Step  80000: Loss 0.5073, LR 1.00e-02, Time 1138.8s
+         Memorization rate: 0.000
+Step  81000: Loss 0.5092, LR 1.00e-02, Time 1151.9s
+         Memorization rate: 0.000
+Step  82000: Loss 0.3647, LR 1.00e-02, Time 1164.8s
+         Memorization rate: 0.000
+Step  83000: Loss 0.5294, LR 1.00e-02, Time 1178.1s
+         Memorization rate: 0.000
+Step  84000: Loss 0.4284, LR 1.00e-02, Time 1192.0s
+         Memorization rate: 0.000
+Step  85000: Loss 0.3916, LR 1.00e-02, Time 1205.0s
+         Memorization rate: 0.000
+Step  86000: Loss 0.5101, LR 1.00e-02, Time 1217.9s
+         Memorization rate: 0.000
+Step  87000: Loss 0.4173, LR 1.00e-02, Time 1231.0s
+         Memorization rate: 0.000
+Step  88000: Loss 0.4158, LR 1.00e-02, Time 1244.1s
+         Memorization rate: 0.000
+Step  89000: Loss 0.3785, LR 1.00e-02, Time 1257.2s
+         Memorization rate: 0.000
+Step  90000: Loss 0.4570, LR 1.00e-02, Time 1270.2s
+         Memorization rate: 0.000
+Step  91000: Loss 0.4814, LR 1.00e-02, Time 1283.7s
+         Memorization rate: 0.000
+Step  92000: Loss 0.4935, LR 1.00e-02, Time 1296.6s
+         Memorization rate: 0.000
+Step  93000: Loss 0.4340, LR 1.00e-02, Time 1309.5s
+         Memorization rate: 0.000
+Step  94000: Loss 0.4102, LR 1.00e-02, Time 1336.4s
+         Memorization rate: 0.000
+Step  95000: Loss 0.3974, LR 1.00e-02, Time 1350.6s
+         Memorization rate: 0.000
+Step  96000: Loss 0.4178, LR 1.00e-02, Time 1362.9s
+         Memorization rate: 0.000
+Step  97000: Loss 0.3463, LR 1.00e-02, Time 1376.5s
+         Memorization rate: 0.000
+Step  98000: Loss 0.3678, LR 1.00e-02, Time 1389.2s
+         Memorization rate: 0.000
+Step  99000: Loss 0.4058, LR 1.00e-02, Time 1402.2s
+         Memorization rate: 0.000
+Reached max steps (100000) without convergence
+Final loss: 0.3986
+Training completed in 1415.0 seconds
+
+📊 FIXED RESULTS:
+   Training time: 1415.8 seconds
+   Final loss: inf
+   Converged: False
+   Status: unknown
+❌ Still not working - needs more investigation
+   Expected: Loss < 0.05 and convergence
+   Actual: Loss = inf, Converged = False
+
+❌ Basic fix failed - need more debugging

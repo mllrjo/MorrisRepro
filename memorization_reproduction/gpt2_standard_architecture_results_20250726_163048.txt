@@ -1,0 +1,9 @@
+GPT-2 Standard Architecture Test Results
+Date: 2025-07-26 16:30:48.977883
+Standard GPT-2 params: 4,224,512
+Standard bits/param: 0.047079
+Morris-Micro baseline: 0.124000
+Improvement factor: 0.4x
+Parameter efficiency: 0.1x
+Execution time: 0.31 hours
+Architecture: 4L×256D×4H
